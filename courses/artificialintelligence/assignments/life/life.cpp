@@ -1,23 +1,55 @@
 #include <vector>
 #include <iostream>
+#include <fstream>
 
 //Functions
 
-std::string getTestFile();
+void getGridSize(std::vector<bool> &grid);
 
+void setGridSize(std::vector<bool> grid, int x, int y);
+
+std::string getTestFile(std::ifstream &testFile);
+
+std::ifstream loadTestFile(std::vector<bool> &grid);
+
+void printBoard(std::vector<bool> &grid);
 
 int main(){
 
-  int x = 0;
-  int y = 0;
-
   std::vector<bool> grid[2];
+  std::fstream file;
 
   //clear the board to start
   grid[0].clear();
   grid[1].clear();
 
-  //uses console input and output
+  //get the grid size from the user
+  getGridSize(*grid);
+
+  //Get the test file from the user
+  //std::string fileName = getTestFile(file);
+
+  //Load in the test file into the grid
+  loadTestFile(*grid);
+
+  //prints the board
+  printBoard(*grid);
+
+  //TODO: Run all four rules on the board
+
+  //Prints the updated board
+  printBoard(*grid);
+
+  //TODO: Compare with output file
+
+  return 0;
+};
+
+//The purpose of this function is to get the size of the grid from the user
+void getGridSize(std::vector<bool> *grid)
+{
+  int x = 0;
+  int y = 0;
 
   std::cout << "How big do you want the board to be?" << std::endl;
 
@@ -43,9 +75,21 @@ int main(){
     }
   }
 
+  setGridSize(*grid, x, y);
+}
+
+//The purpose of this function is to set a new size to the grid
+void setGridSize(std::vector<bool> *grid, int x, int y)
+{
   //Resizes the grid to the new size
   grid[0].resize(x);
   grid[1].resize(y);
+}
+
+//The purpose of this function is to get a file name for a test file from the user
+std::string getTestFile(std::ifstream file)
+{
+  std::string testFile;
 
   //Gets a test from user
   bool validInput = false;
@@ -59,8 +103,28 @@ int main(){
 
     if(userInput == 'y' || userInput == 'Y')
     {
-      validInput = true;
-      std::string testFile = getTestFile();
+      validInput = false;
+      while(!validInput)
+      {
+
+        std::string fileName;
+
+        std::cout << "What is the name of the test file you wish to test?" << std::endl;
+        std::cout << "FileName: ";
+        std::cin >> fileName;
+
+        file.open(testFile);
+        if(file.good())
+        {
+          validInput = true;
+          return fileName;
+        }
+        else
+        {
+          std::cout << "Please input a valid test file" << std::endl;
+        }
+      }
+
       break;
     }
     else if (userInput == 'n' || userInput == 'N')
@@ -72,36 +136,18 @@ int main(){
       std::cout << std::endl << "Please type in a valid input. (Y/n)" << std::endl;
     }
   }
-
-  //TODO: Load in the test file to the board
-
-  //TODO: Print the board
-
-  //prints the board
-
-  //printBoard({columns, lines});
-
-  //TODO: Run all four rules on the board
-
-  //TODO: Print the updated board
-
-  //TODO: Compare with output file
-
-  return 0;
-};
-
-std::string getTestFile()
-{
-  bool validInput = false;
-  std::string fileName;
-  while(!validInput)
-  {
-    std::cout << "What is the name of the test file you wish to test?" << std::endl;
-    std::cout << "FileName: ";
-    std::cin >> fileName;
-
-    //TODO; determine if it is valid or not
-    validInput = true; //temporary
-  }
-  return fileName;
 }
+
+//The purpose of this function is to load in a test file into the grid
+std::ifstream loadTestFile(std::vector<bool> &grid)
+{
+  //TODO: Load in the test file to the board
+}
+
+void printBoard(std::vector<bool> &grid)
+{
+  //TODO: Print the board
+}
+
+
+
