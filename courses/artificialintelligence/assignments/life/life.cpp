@@ -4,15 +4,15 @@
 
 //Functions
 
-void getGridSize(std::vector<bool> &grid);
+void getGridSize(std::vector<bool> *grid);
 
-void setGridSize(std::vector<bool> grid, int x, int y);
+void setGridSize(std::vector<bool> *grid, int x, int y);
 
-std::string getTestFile(std::ifstream &testFile);
+std::string getTestFile(std::ifstream *testFile);
 
-std::ifstream loadTestFile(std::vector<bool> &grid);
+std::ifstream loadTestFile(std::vector<bool> *grid);
 
-void printBoard(std::vector<bool> &grid);
+void printBoard(std::vector<bool> *grid);
 
 int main(){
 
@@ -24,21 +24,21 @@ int main(){
   grid[1].clear();
 
   //get the grid size from the user
-  getGridSize(*grid);
+  getGridSize(grid);
 
   //Get the test file from the user
   //std::string fileName = getTestFile(file);
 
   //Load in the test file into the grid
-  loadTestFile(*grid);
+  loadTestFile(grid);
 
   //prints the board
-  printBoard(*grid);
+  printBoard(grid);
 
   //TODO: Run all four rules on the board
 
   //Prints the updated board
-  printBoard(*grid);
+  printBoard(grid);
 
   //TODO: Compare with output file
 
@@ -75,7 +75,7 @@ void getGridSize(std::vector<bool> *grid)
     }
   }
 
-  setGridSize(*grid, x, y);
+  setGridSize(grid, x, y);
 }
 
 //The purpose of this function is to set a new size to the grid
@@ -87,7 +87,7 @@ void setGridSize(std::vector<bool> *grid, int x, int y)
 }
 
 //The purpose of this function is to get a file name for a test file from the user
-std::string getTestFile(std::ifstream file)
+std::string getTestFile(std::ifstream *file)
 {
   std::string testFile;
 
@@ -113,8 +113,8 @@ std::string getTestFile(std::ifstream file)
         std::cout << "FileName: ";
         std::cin >> fileName;
 
-        file.open(testFile);
-        if(file.good())
+        file->open(testFile);
+        if(file->good())
         {
           validInput = true;
           return fileName;
@@ -139,12 +139,12 @@ std::string getTestFile(std::ifstream file)
 }
 
 //The purpose of this function is to load in a test file into the grid
-std::ifstream loadTestFile(std::vector<bool> &grid)
+std::ifstream loadTestFile(std::vector<bool> *grid)
 {
   //TODO: Load in the test file to the board
 }
 
-void printBoard(std::vector<bool> &grid)
+void printBoard(std::vector<bool> *grid)
 {
   //TODO: Print the board
 }
