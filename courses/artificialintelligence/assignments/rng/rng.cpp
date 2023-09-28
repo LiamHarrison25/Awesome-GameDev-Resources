@@ -4,73 +4,37 @@
 #include <iostream>
 #include <istream>
 
-std::string getTestName();
+const std::string TEST_FOLDER = "\\tests\\";
 
-int getTestNumber();
-
-int xorShift(int number);
+unsigned int xorShift(unsigned int seed, int r1, int r2);
 
 int main(){
   // code here
 
-  //Takes in the data from a test file
-  int number = getTestNumber();
+  unsigned int seed, N, min, max;
 
-  //Run xor shift
-  int newNumber = xorShift(number);
+  std::cin >> seed >> N >> min >> max;
 
-  //output the new values
-
-  std::cout << std::endl << "The new randomized number is: " << newNumber << std::endl;
-
-}
-
-//The purpose of this function is to get a test name from the user
-std::string getTestName()
-{
-  std::cout << std::endl << "Please enter the name of the test: ";
-  std::string userInput;
-  std::cin >> userInput;
-  return userInput;
-}
-
-//The purpose of this function is to load in a test file and output the value from it
-int getTestNumber()
-{
-  std::string userInput;
-      bool validTest = false;
-  while(!validTest)
+  unsigned int i;
+  for(i = N; i >= 1; i--)
   {
-    //gets file name from user
-    userInput = getTestName();
-
-    //load in from file
-    std::fstream file;
-    file.open(userInput);
-
-    //check if file opens
-    if(file.good())
-    {
-      std::cout << std::endl << "file loaded successfully" << std::endl;
-
-      //read the files 32-bit number
-      int numOutput = file.get();
-
-      validTest = true;
-
-      return numOutput;
-
-    }
+    //Run xor shift
+    seed = xorShift(seed, min, max);
   }
-}
 
+}
 
 //The purpose of this function is to take the number and xor shift it to output a sudo-random number
-int xorShift(int number)
+unsigned int xorShift(unsigned int seed, int r1, int r2)
 {
-  //TODO: do the xorShift on the number to randomize it
+    seed = seed xor (seed << 13);
 
+    seed = seed xor (seed >> 17);
 
+    seed = seed xor (seed << 5);
+    int value = r1 + (seed % (r2 - r1 + 1)); //clamps the value to between r1 and r2
 
-  return 0;
+    //output the new values
+    std::cout << value << std::endl;
+    return seed;
 }
