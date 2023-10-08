@@ -49,19 +49,39 @@ std::vector<bool> readBoard(int sideSize) {
 int main() {
   std::string turn;
   int sideSize;
+  bool win = false;
   int catX, catY;
+  std::string junk;
   std::vector<bool> blocked;
   std::cin >> turn >> sideSize >> catX >> catY;
   blocked = readBoard(sideSize);
-  // while(not win){ simulate; } // todo: create your own logic to test and simulate, check for win conditions etc.
-  if(turn == "CAT"){
-    Cat cat;
-    auto catMove = cat.move(blocked, {catX, catY}, sideSize);
-    print(blocked, sideSize, {catMove.first, catMove.second}, "CATCHER");
-  } else if (turn == "CATCHER") {
-    Catcher catcher;
-    auto catcherMove = catcher.move(blocked, {catX, catY}, sideSize);
-    blocked[(catcherMove.second + sideSize/2) * sideSize + catcherMove.first+sideSize/2] = true;
-    print(blocked, sideSize, {catX, catY}, "CATCHER");
+  while(!win)
+  {
+    if(turn == "CAT"){
+      Cat cat;
+      auto catMove = cat.move(blocked, {catX, catY}, sideSize);
+      print(blocked, sideSize, {catMove.first, catMove.second}, "CATCHER");
+    } else if (turn == "CATCHER") {
+      Catcher catcher;
+      auto catcherMove = catcher.move(blocked, {catX, catY}, sideSize);
+      blocked[(catcherMove.second + sideSize/2) * sideSize + catcherMove.first+sideSize/2] = true;
+      print(blocked, sideSize, {catX, catY}, "CATCHER");
+    }
+
+    //TODO:
+    //if the cat has no moves left:
+    //win = true;
+
+    //if the cat escapes the board:
+    //win = true;
+
+    std::cout << std::endl << "press any key to continue: ";
+    std::cin >> junk;
+    std::cout << std::endl;
+
   }
+
+
+
 }
+
