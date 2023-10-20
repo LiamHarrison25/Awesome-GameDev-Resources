@@ -2,6 +2,7 @@
 #define CAT_h
 #include "IAgent.h"
 #include <queue>
+#include <cstdint>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -32,7 +33,7 @@ struct Cat : public IAgent {
     //loop to create the cameFrom map
     while(!frontier.empty()) //loops until the frontier is empty
     {
-      std::pair currentPos = frontier.front();
+      auto currentPos = frontier.front();
       frontier.pop();
 
       if(sideSize *  currentPos.second + currentPos.first == sideSize / 2 || sideSize * currentPos.second + currentPos.first == -sideSize / 2)
@@ -48,7 +49,7 @@ struct Cat : public IAgent {
       {
         //check if neighbor is false
         int oneDimensionNeighbor = sideSize * neighbors[i].second + neighbors[i].first;
-        if(!world[oneDimensionNeighbor] && reached.) //checks if neighbor is available to move to
+        if(!world[oneDimensionNeighbor]) //checks if neighbor is available to move to
         {
           //TODO: check if neighbor has not been reached
           //TODO: check if neighbor is in frontier set
@@ -82,21 +83,21 @@ struct Cat : public IAgent {
 
     if(catP.second %2 == 0) //if row is even
     {
-      neighbors.push_back(std::pair(catP.first - 1, catP.second - 1)); //Top left
-      neighbors.push_back(std::pair(catP.first, catP.second - 1)); //Top right
-      neighbors.push_back(std::pair(catP.first + 1, catP.second)); // right
-      neighbors.push_back(std::pair(catP.first, catP.second + 1)); //bottom right
-      neighbors.push_back(std::pair(catP.first - 1, catP.second + 1)); //bottom left
-      neighbors.push_back(std::pair(catP.first - 1, catP.second)); //left
+      neighbors.push_back(std::pair<int, int>(catP.first - 1, catP.second - 1)); //Top left
+      neighbors.push_back(std::pair<int, int>(catP.first, catP.second - 1)); //Top right
+      neighbors.push_back(std::pair<int, int>(catP.first + 1, catP.second)); // right
+      neighbors.push_back(std::pair<int, int>(catP.first, catP.second + 1)); //bottom right
+      neighbors.push_back(std::pair<int, int>(catP.first - 1, catP.second + 1)); //bottom left
+      neighbors.push_back(std::pair<int, int>(catP.first - 1, catP.second)); //left
     }
     else
     {
-      neighbors.push_back(std::pair(catP.first, catP.second - 1)); //Top left
-      neighbors.push_back(std::pair(catP.first + 1, catP.second - 1)); //Top right
-      neighbors.push_back(std::pair(catP.first + 1, catP.second)); // right
-      neighbors.push_back(std::pair(catP.first + 1, catP.second + 1)); //bottom right
-      neighbors.push_back(std::pair(catP.first, catP.second + 1)); //bottom left
-      neighbors.push_back(std::pair(catP.first - 1, catP.second)); //left
+      neighbors.push_back(std::pair<int, int>(catP.first, catP.second - 1)); //Top left
+      neighbors.push_back(std::pair<int, int>(catP.first + 1, catP.second - 1)); //Top right
+      neighbors.push_back(std::pair<int, int>(catP.first + 1, catP.second)); // right
+      neighbors.push_back(std::pair<int, int>(catP.first + 1, catP.second + 1)); //bottom right
+      neighbors.push_back(std::pair<int, int>(catP.first, catP.second + 1)); //bottom left
+      neighbors.push_back(std::pair<int, int>(catP.first - 1, catP.second)); //left
     }
 
     return neighbors;
@@ -130,7 +131,81 @@ struct priority_queue
     return bestItem;
   }
 
+};
 
+//used to store the position of a node
+struct Position
+{
+
+  uint32_t x;
+  uint32_t y;
+
+  std::pair<int, int> toPair()
+  {
+    return {x, y};
+  }
+
+//  std::pair<int, int> E()
+//  {
+//
+//  }
+//
+//  std::pair<int, int> SE()
+//  {
+//
+//  }
+//
+//  std::pair<int, int> SW()
+//  {
+//
+//  }
+//
+//  std::pair<int, int> W()
+//  {
+//
+//  }
+//
+//  std::pair<int, int> NW()
+//  {
+//
+//  }
+
+
+  //spatial hashing
+  uint64_t hash() const noexcept
+  {return ((uint64_t) x) << 32 | (uint64_t)y; }
+
+};
+
+
+namespace std {
+  template <> struct hash<Position>
+  {
+    std::size_t operator()(const Position& p) const noexcept
+    {
+      return p.hash();
+    }
+  };
+}
+
+
+struct Point2D
+{
+  int32_t x;
+  int32_t y;
+
+  Point2D(int32_t x, int32_t y): x(x), y(y) {}
+};
+
+struct AStarNode
+{
+  Position pos;
+  float accumulatedCost;
+  float heuristic;
+  bool operator < (const AStarNode& n) const
+  {
+    return this->accumulatedCost + this->heuristic < n.accumulatedCost + n.heuristic;
+  }
 };
 
 #endif
