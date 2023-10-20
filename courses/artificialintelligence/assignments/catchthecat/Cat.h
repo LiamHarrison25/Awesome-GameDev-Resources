@@ -2,7 +2,8 @@
 #define CAT_h
 #include "IAgent.h"
 #include <queue>
-#include <map>
+#include <unordered_map>
+#include <unordered_set>
 
 struct Cat : public IAgent {
   std::pair<int,int> move(const std::vector<bool>& world, std::pair<int,int> catPos, int sideSize ) override{
@@ -12,13 +13,17 @@ struct Cat : public IAgent {
 
     std::pair<int, int> exitPoint;
 
+    //Queue used to move through the entire grid
     std::queue<std::pair<int, int>> frontier;
 
+    //Stores the points that are currently in the frontier
+    std::unordered_set<int> frontierSet;
+
     //Stores the neighbors that have been reached
-    std::vector<int> reached;
+    std::unordered_set<int> reached; //stores the point by linearizing the std pair
 
     //Map that stores where a point came from. The key is a linearized point, and the data is a 2d point which is where it came from.
-    std::map<int, std::pair<int, int>> cameFrom;
+    std::unordered_map<int, std::pair<int, int>> cameFrom;
 
     int oneDimensionCatPosition = sideSize * catPos.second + catPos.first;
 
@@ -43,12 +48,14 @@ struct Cat : public IAgent {
       {
         //check if neighbor is false
         int oneDimensionNeighbor = sideSize * neighbors[i].second + neighbors[i].first;
-        if(!world[oneDimensionNeighbor]) //checks if neighbor is available to move to
+        if(!world[oneDimensionNeighbor] && reached.) //checks if neighbor is available to move to
         {
           //TODO: check if neighbor has not been reached
+          //TODO: check if neighbor is in frontier set
 
           frontier.emplace(oneDimensionNeighbor, oneDimensionCatPosition); //adds the neighbor and where it came from to the frontier
-          reached.push_back(oneDimensionNeighbor); //adds the neighbor to reached
+          frontierSet.insert(oneDimensionNeighbor);
+          reached.insert(oneDimensionNeighbor); //adds the neighbor to reached
           cameFrom.emplace(oneDimensionNeighbor, currentPos); //adds where it came from
         }
       }
@@ -94,6 +101,35 @@ struct Cat : public IAgent {
 
     return neighbors;
   }
+
+};
+
+template <typename T, typename priorityT>
+struct priority_queue
+{
+  typedef std::pair< priorityT, T> element;
+  std:: priority_queue<element, std::vector<element>, std::greater<element>> elements;
+
+  //The purpose of this function is to check if the priority queue is empty
+  [[nodiscard]] bool isEmpty() const
+  {
+    return elements.empty();
+  }
+
+  //The purpose of this function is to push an item into the priority queue
+  void push(T item, priorityT priorityT1)
+  {
+    elements.emplace(priorityT1, item);
+  }
+
+  //The purpose of this function is to pop the best item, and return it
+  T pop()
+  {
+    T bestItem = elements.top().second;
+    elements.pop();
+    return bestItem;
+  }
+
 
 };
 
