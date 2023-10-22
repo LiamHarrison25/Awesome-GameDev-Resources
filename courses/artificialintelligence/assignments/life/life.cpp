@@ -122,5 +122,41 @@ int numNeighbors(int cell, const std::vector<bool> &grid, int columns, int rows)
 {
   //TODO: check the amount of neighbors the current cell has and return it
 
+  std::pair<int, int> p;
+  p.first =
+
+  if(p.y %2 == 0) //if even row
+  {
+    return
+        w.Get(p + Point2D(-1, -1)) + //Top Left
+        w.Get(p + Point2D(0, -1)) + //Top Right
+        w.Get(p + Point2D(-1, 0)) + //Left
+        w.Get(p + Point2D(1, 0)) +
+        w.Get(p + Point2D(-1, 1)) +
+        w.Get(p + Point2D(0, 1));
+  }
+  else
+  {
+    return
+        w.Get(p + Point2D(0, -1)) + //Top Left
+        w.Get(p + Point2D(1, -1)) + //Top Right
+        w.Get(p + Point2D(-1, 0)) + //Left
+        w.Get(p + Point2D(1, 0)) +
+        w.Get(p + Point2D(0, 1)) +
+        w.Get(p + Point2D(1, 1));
+  }
+
   return 0; //TODO: change this
+}
+
+bool isValidPoint(std::pair<int, int> point, int columns, int rows)
+{
+  if(point.first < 0) point.first += rows;
+  if(point.first >= rows) point.first %= rows;
+  if(point.second < 0) point.second += columns;
+  if(point.second >= columns) point.second %= columns;
+  auto index = point.second * columns * rows + point.first;
+  auto squareGrid = columns * rows;
+  if(index >= squareGrid) index %= squareGrid;
+  return
 }
