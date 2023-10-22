@@ -6,6 +6,84 @@
 #include <unordered_map>
 #include <unordered_set>
 
+
+struct Point2D
+{
+  int32_t x;
+  int32_t y;
+
+  //Constructors
+  Point2D(int32_t x, int32_t y): x(x), y(y) {}
+  //converts pair<int, int> to Point2D
+  Point2D(const std::pair<int32_t, int32_t>& p): x(p.first), y(p.second) {}
+  Point2D() {x = 0; y = 0;}; //default constructor
+
+  //for unordered_set unordered_map
+  uint64_t hash() const noexcept { return ((uint64_t)x) << 32 | (uint64_t)y; }
+
+  //for priority_queue, map, set
+  bool operator < (const Point2D& p) const {return x < p.x || (x == p.x && y < p.y); }
+
+
+
+  //add operators, accessor, NE(), etc
+
+  //functions for getting the neighbors of the node
+  std::vector<std::pair<int, int>> getNeighbors()
+  {
+
+    std::vector<std::pair<int,int>> neighbors;
+
+    if(y %2 == 0) //if row is even
+    {
+      neighbors.emplace_back(x - 1, y - 1); //Top left
+      neighbors.emplace_back(x, y - 1); //Top right
+      neighbors.emplace_back(x + 1, y); // right
+      neighbors.emplace_back(x, y + 1); //bottom right
+      neighbors.emplace_back(x - 1, y + 1); //bottom left
+      neighbors.emplace_back(x - 1, y); //left
+    }
+    else
+    {
+      neighbors.emplace_back(x, y - 1); //Top left
+      neighbors.emplace_back(x + 1, y - 1); //Top right
+      neighbors.emplace_back(x + 1, y); // right
+      neighbors.emplace_back(x + 1, y + 1); //bottom right
+      neighbors.emplace_back(x, y + 1); //bottom left
+      neighbors.emplace_back(x - 1, y); //left
+    }
+
+    return neighbors;
+  }
+
+};
+
+namespace std {
+  template <> struct hash<Point2D>
+  {
+    std::size_t operator()(const Point2D& p) const noexcept
+    {
+      return p.hash();
+    }
+  };
+}
+
+struct AStarNode
+{
+  Point2D pos;
+  float accumulatedCost;
+  float heuristic;
+
+  //constructors
+  AStarNode(const std::pair<int32_t, int32_t>& p) {pos.x = p.first; pos.y = p.second; accumulatedCost = 0; heuristic = 0;}
+
+  //for priority queue
+  bool operator < (const AStarNode& n) const
+  {
+    return this->accumulatedCost + this->heuristic < n.accumulatedCost + n.heuristic;
+  }
+};
+
 struct Cat : public IAgent {
   std::pair<int,int> move(const std::vector<bool>& world, std::pair<int,int> catPos, int sideSize ) override{
 
@@ -15,7 +93,7 @@ struct Cat : public IAgent {
     std::pair<int, int> exitPoint;
 
     //Queue used to move through the entire grid
-    std::queue<std::pair<int, int>> frontier;
+    std::queue<AStarNode> frontier;
 
     //Stores the points that are currently in the frontier
     std::unordered_set<int> frontierSet;
@@ -24,9 +102,11 @@ struct Cat : public IAgent {
     std::unordered_set<int> reached; //stores the point by linearizing the std pair
 
     //Map that stores where a point came from. The key is a linearized point, and the data is a 2d point which is where it came from.
-    std::unordered_map<int, std::pair<int, int>> cameFrom;
+    std::unordered_map<int, AStarNode> cameFrom;
 
     int oneDimensionCatPosition = sideSize * catPos.second + catPos.first;
+
+    AStarNode catPosition(catPos);
 
     frontier.push(catPos);
 
@@ -76,136 +156,34 @@ struct Cat : public IAgent {
     return path[path.size() -2];
   }
 
-  std::vector<std::pair<int, int>> getNeighbors(std::pair<int, int> catP)
-  {
-
-    std::vector<std::pair<int,int>> neighbors;
-
-    if(catP.second %2 == 0) //if row is even
-    {
-      neighbors.push_back(std::pair<int, int>(catP.first - 1, catP.second - 1)); //Top left
-      neighbors.push_back(std::pair<int, int>(catP.first, catP.second - 1)); //Top right
-      neighbors.push_back(std::pair<int, int>(catP.first + 1, catP.second)); // right
-      neighbors.push_back(std::pair<int, int>(catP.first, catP.second + 1)); //bottom right
-      neighbors.push_back(std::pair<int, int>(catP.first - 1, catP.second + 1)); //bottom left
-      neighbors.push_back(std::pair<int, int>(catP.first - 1, catP.second)); //left
-    }
-    else
-    {
-      neighbors.push_back(std::pair<int, int>(catP.first, catP.second - 1)); //Top left
-      neighbors.push_back(std::pair<int, int>(catP.first + 1, catP.second - 1)); //Top right
-      neighbors.push_back(std::pair<int, int>(catP.first + 1, catP.second)); // right
-      neighbors.push_back(std::pair<int, int>(catP.first + 1, catP.second + 1)); //bottom right
-      neighbors.push_back(std::pair<int, int>(catP.first, catP.second + 1)); //bottom left
-      neighbors.push_back(std::pair<int, int>(catP.first - 1, catP.second)); //left
-    }
-
-    return neighbors;
-  }
-
 };
 
-template <typename T, typename priorityT>
-struct priority_queue
-{
-  typedef std::pair< priorityT, T> element;
-  std:: priority_queue<element, std::vector<element>, std::greater<element>> elements;
-
-  //The purpose of this function is to check if the priority queue is empty
-  [[nodiscard]] bool isEmpty() const
-  {
-    return elements.empty();
-  }
-
-  //The purpose of this function is to push an item into the priority queue
-  void push(T item, priorityT priorityT1)
-  {
-    elements.emplace(priorityT1, item);
-  }
-
-  //The purpose of this function is to pop the best item, and return it
-  T pop()
-  {
-    T bestItem = elements.top().second;
-    elements.pop();
-    return bestItem;
-  }
-
-};
-
-//used to store the position of a node
-struct Position
-{
-
-  uint32_t x;
-  uint32_t y;
-
-  std::pair<int, int> toPair()
-  {
-    return {x, y};
-  }
-
-//  std::pair<int, int> E()
-//  {
+//template <typename T, typename priorityT>
+//struct priority_queue
+//{
+//  typedef std::pair< priorityT, T> element;
+//  std:: priority_queue<element, std::vector<element>, std::greater<element>> elements;
 //
+//  //The purpose of this function is to check if the priority queue is empty
+//  [[nodiscard]] bool isEmpty() const
+//  {
+//    return elements.empty();
 //  }
 //
-//  std::pair<int, int> SE()
+//  //The purpose of this function is to push an item into the priority queue
+//  void push(T item, priorityT priorityT1)
 //  {
-//
+//    elements.emplace(priorityT1, item);
 //  }
 //
-//  std::pair<int, int> SW()
+//  //The purpose of this function is to pop the best item, and return it
+//  T pop()
 //  {
-//
+//    T bestItem = elements.top().second;
+//    elements.pop();
+//    return bestItem;
 //  }
 //
-//  std::pair<int, int> W()
-//  {
-//
-//  }
-//
-//  std::pair<int, int> NW()
-//  {
-//
-//  }
-
-
-  //spatial hashing
-  uint64_t hash() const noexcept
-  {return ((uint64_t) x) << 32 | (uint64_t)y; }
-
-};
-
-
-namespace std {
-  template <> struct hash<Position>
-  {
-    std::size_t operator()(const Position& p) const noexcept
-    {
-      return p.hash();
-    }
-  };
-}
-
-
-struct Point2D
-{
-  int32_t x;
-  int32_t y;
-
-  Point2D(int32_t x, int32_t y): x(x), y(y) {}
-};
-
-struct AStarNode
-{
-  Position pos;
-  float accumulatedCost;
-  float heuristic;
-  bool operator < (const AStarNode& n) const
-  {
-    return this->accumulatedCost + this->heuristic < n.accumulatedCost + n.heuristic;
-  }
-};
+//};
 
 #endif
