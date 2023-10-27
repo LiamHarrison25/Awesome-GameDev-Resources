@@ -47,7 +47,7 @@ struct Cat : public IAgent {
       {
         //check if neighbor is false
         int oneDimensionNeighbor = sideSize * neighbors[i].y + neighbors[i].x;
-        if(!world[oneDimensionNeighbor]  && !cameFrom.contains(neighbors[i])) //checks if neighbor is available to move to and if it has already been reached
+        if(!world[oneDimensionNeighbor]  && !cameFrom.contains(neighbors[i]) && abs(neighbors[i].x) <= sideSize/2 && abs(neighbors[i].y) <= sideSize/2) //checks if neighbor is available to move to and if it has already been reached
         {
           frontier.emplace(neighbors[i], currentPos.accumulatedCost + 1, getDistanceToBorder(neighbors[i], sideSize)); //adds the neighbor to the frontier
           cameFrom[neighbors[i]] = currentPos.pos; //adds where it came from

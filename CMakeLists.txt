@@ -1,6 +1,6 @@
 # set the minimum cmake version to generate projects.
 cmake_minimum_required(VERSION 3.14)
-
+set(CMAKE_CXX_STANDARD 23)
 project(
         AwesomeCppCourse
         LANGUAGES CXX
@@ -29,14 +29,14 @@ CPMAddPackage("gh:onqtam/doctest@2.4.8")
 # options to what include and use
 OPTION(ENABLE_INTRO "ENABLE_INTRO" ON)
 IF(ENABLE_INTRO)
-  set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD 23)
   add_subdirectory(courses/intro)
 endif()
 
 # options to what include and use
 OPTION(ENABLE_ADVANCED_CPP "ENABLE_ADVANCED_CPP" ON)
 IF(ENABLE_ADVANCED_CPP)
-  set(CMAKE_CXX_STANDARD 20)
+  set(CMAKE_CXX_STANDARD 23)
   add_subdirectory(courses/advanced)
 endif()
 
