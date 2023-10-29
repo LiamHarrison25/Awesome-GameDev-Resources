@@ -17,19 +17,19 @@ struct Point2D
   int32_t x;
   int32_t y;
 
-  //Constructors:
+  //SECTION: Constructors:
 
   Point2D(int32_t x, int32_t y): x(x), y(y) {}
   //converts pair<int, int> to Point2D
   Point2D(const std::pair<int32_t, int32_t>& p): x(p.first), y(p.second) {}
   Point2D() {x = 0; y = 0;}; //default constructor
 
-  //for unordered_set unordered_map
+  //NOTE: used for unordered_set unordered_map
   uint64_t hash() const noexcept { return ((uint64_t)x) << 32 | (uint64_t)y; }
 
-  //Operator overloads:
+  //SECTION: Operator overloads:
 
-  //for priority_queue, map, set
+  //NOTE: used for priority_queue, map, set
   bool operator < (const Point2D& p) const {return x < p.x || (x == p.x && y < p.y);}
   Point2D& operator=(const Point2D& p)= default;
   Point2D& operator=(const std::pair<int32_t, int32_t>& p){
@@ -40,7 +40,7 @@ struct Point2D
   bool operator==(const Point2D& p) const { return x == p.x && y == p.y; }
   bool operator!=(const Point2D& p) const{ return x != p.x || y != p.y; }
 
-  //functions for getting the neighbors of the node
+  //SECTION: functions for getting the neighbors of the node
   std::vector<Point2D> getNeighbors()
   {
 
